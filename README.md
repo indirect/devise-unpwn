@@ -1,10 +1,6 @@
 # Devise::Unpwn
 Devise extension that checks user passwords against the HaveIBeenPwned dataset https://haveibeenpwned.com/Passwords
 
-Based on
-
-https://github.com/michaelbanfield/devise-pwned_password
-
 
 ## Usage
 Add the :unpwned module to your existing Devise model.
@@ -19,9 +15,7 @@ end
 Users will receive the following error message if they use a password from the
 HaveIBeenPwned dataset:
 
-```
-Password has previously appeared in a data breach and should never be used. Please choose something harder to guess.
-```
+> Password has previously appeared in a data breach and should never be used. Please choose something harder to guess.
 
 You can customize this error message by modifying the `devise` YAML file.
 
@@ -35,9 +29,7 @@ en:
 
 You can optionally warn existing users when they sign in if they are using a password from the HaveIBeenPwned dataset. The default message is:
 
-```
-Your password has previously appeared in a data breach and should never be used. We strongly recommend you change your password.
-```
+> Your password has previously appeared in a data breach and should never be used. We strongly recommend you change your password.
 
 You can customize this message by modifying the `devise` YAML file.
 
@@ -90,8 +82,8 @@ This should generally be added in `app/controllers/application_controller.rb` fo
 # config/initializers/active_admin_devise_sessions_controller.rb
 class ActiveAdmin::Devise::SessionsController
   def after_sign_in_path_for(resource)
-      set_flash_message! :alert, :warn_pwned if resource.respond_to?(:pwned?) && resource.pwned?
-      super
+    set_flash_message! :alert, :warn_pwned if resource.respond_to?(:pwned?) && resource.pwned?
+    super
   end
 end
 ```
@@ -112,14 +104,18 @@ A few things to consider/understand when using this gem:
   application. This could potentially add some latency to this operation. The
   gem is designed to fail silently if the HaveIBeenPwned service is unavailable.
 
+## Attribution
+
+Originally based on [devise-pwned_password](https://github.com/michaelbanfield/devise-pwned_password).
+
+## Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/test` to run the tests. To release a new version, push a new version tag to GitHub by running `bin/rake bump [major|minor|patch]` and then `bin/rake tag`.
+
 ## Contributing
 
-To contribute
+Bug reports and pull requests are welcome on GitHub at https://github.com/indirect/devise-unpwn. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/indirect/devise-unpwn/blob/main/CODE_OF_CONDUCT.md).
 
-* Fork the repository
-* Make your changes
-* Run bin/test to make sure the unit tests still run
-* Send a pull request
+## Code of Conduct
 
-## License
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+Everyone interacting in the Devise::Unpwn project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/indirect/devise-unpwn/blob/main/CODE_OF_CONDUCT.md).
