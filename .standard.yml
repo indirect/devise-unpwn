@@ -1,0 +1,6 @@
+---
+ignore:
+- test/dummy/bin/setup:
+  - Style/MixinUsage
+- test/dummy/bin/update:
+  - Style/MixinUsage

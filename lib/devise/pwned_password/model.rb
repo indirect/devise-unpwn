@@ -34,19 +34,19 @@ module Devise
         hash = Digest::SHA1.hexdigest(password.to_s).upcase
         prefix, suffix = hash.slice!(0..4), hash
 
-        userAgent = "devise_pwned_password"
+        user_agent = "devise_pwned_password"
 
         uri = URI.parse("https://api.pwnedpasswords.com/range/#{prefix}")
 
         begin
           Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: self.class.pwned_password_open_timeout, read_timeout: self.class.pwned_password_read_timeout) do |http|
-            request = Net::HTTP::Get.new(uri.request_uri, "User-Agent" => userAgent)
+            request = Net::HTTP::Get.new(uri.request_uri, "User-Agent" => user_agent)
             response = http.request request
             return false unless response.is_a?(Net::HTTPSuccess)
             @pwned = usage_count(response.read_body, suffix) >= self.class.min_password_matches
             return @pwned
           end
-        rescue StandardError
+        rescue
           return false
         end
 
@@ -55,23 +55,23 @@ module Devise
 
       private
 
-        def usage_count(response, suffix)
-          count = 0
-          response.each_line do |line|
-            if line.start_with? suffix
-              count = line.strip.split(":").last.to_i
-              break
-            end
+      def usage_count(response, suffix)
+        count = 0
+        response.each_line do |line|
+          if line.start_with? suffix
+            count = line.strip.split(":").last.to_i
+            break
           end
-          count
         end
+        count
+      end
 
-        def not_pwned_password
-          # This deliberately fails silently on 500's etc. Most apps wont want to tie the ability to sign up customers to the availability of a third party API
-          if password_pwned?(password)
-            errors.add(:password, :pwned_password)
-          end
+      def not_pwned_password
+        # This deliberately fails silently on 500's etc. Most apps wont want to tie the ability to sign up customers to the availability of a third party API
+        if password_pwned?(password)
+          errors.add(:password, :pwned_password)
         end
+      end
     end
   end
 end
