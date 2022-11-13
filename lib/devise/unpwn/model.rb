@@ -18,9 +18,11 @@ module Devise
       end
 
       module ClassMethods
-        Devise::Models.config(self, :pwned_password_check_on_sign_in)
+        Devise::Models.config(self, :unpwn_check_on_sign_in)
+        Devise::Models.config(self, :unpwn_request_options)
       end
 
+      # Lets us show a message after Warden checks the password during login
       def pwned?
         @pwned ||= false
       end
@@ -29,7 +31,7 @@ module Devise
       def password_pwned?(password)
         request_options = {
           headers: {"User-Agent" => "devise-unpwn"}
-        }
+        }.merge(self.class.unpwn_request_options)
 
         @pwned = Unpwn.new(request_options: request_options).pwned?(password)
       end
@@ -37,9 +39,7 @@ module Devise
       private
 
       def not_pwned_password
-        if password_pwned?(password)
-          errors.add(:password, :pwned_password)
-        end
+        errors.add(:password, :pwned_password) if password_pwned?(password)
       end
     end
   end
