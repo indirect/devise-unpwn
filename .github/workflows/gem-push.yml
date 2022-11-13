@@ -11,7 +11,7 @@ on:
 jobs:
   push_gem:
     name: Build + Publish
-    if: ${{ github.event.workflow_dispatch || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
