@@ -73,7 +73,7 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     ast (2.4.2)
-    bcrypt (3.1.11)
+    bcrypt (3.1.18)
     builder (3.2.4)
     concurrent-ruby (1.1.10)
     crass (1.0.6)
