@@ -1,23 +1,23 @@
-# Devise::PwnedPassword
-Devise extension that checks user passwords against the PwnedPasswords dataset https://haveibeenpwned.com/Passwords
+# Devise::Unpwn
+Devise extension that checks user passwords against the HaveIBeenPwned dataset https://haveibeenpwned.com/Passwords
 
 Based on
 
-https://github.com/HCLarsen/devise-uncommon_password
+https://github.com/michaelbanfield/devise-pwned_password
 
 
 ## Usage
-Add the :pwned_password module to your existing Devise model.
+Add the :unpwned module to your existing Devise model.
 
 ```ruby
 class AdminUser < ApplicationRecord
   devise :database_authenticatable, 
-         :recoverable, :rememberable, :trackable, :validatable, :pwned_password
+         :recoverable, :rememberable, :trackable, :validatable, :unpwned
 end
 ```
 
 Users will receive the following error message if they use a password from the
-PwnedPasswords dataset:
+HaveIBeenPwned dataset:
 
 ```
 Password has previously appeared in a data breach and should never be used. Please choose something harder to guess.
@@ -33,7 +33,7 @@ en:
       pwned_password: "has previously appeared in a data breach and should never be used. If you've ever used it anywhere before, change it immediately!"
 ```
 
-You can optionally warn existing users when they sign in if they are using a password from the PwnedPasswords dataset. The default message is:
+You can optionally warn existing users when they sign in if they are using a password from the HaveIBeenPwned dataset. The default message is:
 
 ```
 Your password has previously appeared in a data breach and should never be used. We strongly recommend you change your password.
@@ -60,26 +60,20 @@ a certain number of times in the data set:
 config.min_password_matches = 10
 ```
 
-By default responses from the PwnedPasswords API are timed out after 5 seconds
+By default responses from the HaveIBeenPwned API are timed out after 5 seconds
 to reduce potential latency problems.
 Optionally, you can add the following snippet to `config/initializers/devise.rb`
 to control the timeout settings:
 
 ```ruby
-config.pwned_password_open_timeout = 1
-config.pwned_password_read_timeout = 2
+config.unpwn_open_timeout = 1
+config.unpwn_read_timeout = 2
 ```
 
 ## Installation
-Add this line to your application's Gemfile:
 
-```ruby
-gem 'devise-pwned_password'
-```
-
-And then execute:
 ```bash
-$ bundle install
+bundle add devise-unpwn
 ```
 
 Optionally, if you also want to warn existing users when they sign in, override `after_sign_in_path_for`
@@ -90,7 +84,7 @@ def after_sign_in_path_for(resource)
 end
 ```
 
-This should generally be added in ```app/controllers/application_controller.rb``` for a rails app. For an Active Admin application the following monkey patch is needed.
+This should generally be added in `app/controllers/application_controller.rb` for a rails app. For an Active Admin application the following monkey patch is needed.
 
 ```ruby
 # config/initializers/active_admin_devise_sessions_controller.rb
@@ -116,13 +110,12 @@ A few things to consider/understand when using this gem:
 
 * This puts an external API in the request path of users signing up to your
   application. This could potentially add some latency to this operation. The
-  gem is designed to fail silently if the PwnedPasswords service is unavailable.
+  gem is designed to fail silently if the HaveIBeenPwned service is unavailable.
 
 ## Contributing
 
 To contribute
 
-* Check the [issue tracker](https://github.com/michaelbanfield/devise-pwned_password/issues) and [pull requests](https://github.com/michaelbanfield/devise-pwned_password/pulls) for anything similar
 * Fork the repository
 * Make your changes
 * Run bin/test to make sure the unit tests still run

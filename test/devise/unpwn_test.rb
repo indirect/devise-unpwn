@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class Devise::PwnedPassword::Test < ActiveSupport::TestCase
+class Devise::Unpwn::Test < ActiveSupport::TestCase
   test "should deny validation for a pwned password" do
     user = User.create email: "example@example.org", password: "password", password_confirmation: "password"
     assert_not user.valid?, "User with pwned password shoud not be valid."

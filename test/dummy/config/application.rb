@@ -3,7 +3,7 @@ require_relative "boot"
 require "rails/all"
 
 Bundler.require(*Rails.groups)
-require "devise/pwned_password"
+require "devise/unpwn"
 
 module Dummy
   class Application < Rails::Application

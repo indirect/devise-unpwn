@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Devise
-  module PwnedPassword
-    VERSION = "0.1.4"
+  module Unpwn
+    VERSION = "0.9"
   end
 end

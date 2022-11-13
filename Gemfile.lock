@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    devise-pwned_password (0.1.4)
+    devise-unpwn (0.9)
       devise (~> 4)
 
 GEM
@@ -187,8 +187,8 @@ GEM
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.3.0)
-    warden (1.2.7)
-      rack (>= 1.0)
+    warden (1.2.9)
+      rack (>= 2.0.9)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -198,7 +198,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  devise-pwned_password!
+  devise-unpwn!
   rails (~> 7.0)
   sprockets-rails (~> 3.4)
   sqlite3 (~> 1.5)
