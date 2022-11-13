@@ -1,8 +1,14 @@
 module Factories
   def create_user(password:)
-    user = User.create(email: "example@example.org", password: password, password_confirmation: password)
-    user.save(validate: false)
-    user
+    User.new(
+      email: "example@example.org",
+      password: password,
+      password_confirmation: password
+    ).tap do |user|
+      user.save(validate: false)
+      user.password_confirmation = user.password = user.password
+      # user.valid? && puts(%(user.errors.messages=#{(user.errors.messages).inspect}))
+    end
   end
 
   def pwned_password
@@ -11,7 +17,6 @@ module Factories
 
   def pwned_password_user
     create_user(password: pwned_password)
-    # puts %(user.errors.messages=#{(user.errors.messages).inspect})
   end
 
   def valid_password

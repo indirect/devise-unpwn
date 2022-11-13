@@ -13,7 +13,7 @@ class SignUpTest < ActionDispatch::IntegrationTest
 
   test "using a pwned password" do
     sign_up_user password: pwned_password
-    assert_content(/has appeared in a data breach \d{7,} times/)
+    assert_content(/has appeared in a data breach/)
   end
 end
 
@@ -47,6 +47,6 @@ class ChangePasswordTest < ActionDispatch::IntegrationTest
     user = valid_password_user
     sign_in_user user, password: valid_password
     change_password current: valid_password, new: pwned_password
-    assert_content(/has appeared in a data breach \d{7,} times/)
+    assert_content(/has appeared in a data breach/)
   end
 end

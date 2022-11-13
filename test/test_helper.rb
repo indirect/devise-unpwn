@@ -26,8 +26,6 @@ end
 class ActiveSupport::TestCase
   def setup
     super
-    User.min_password_matches = 1
-    User.min_password_matches_warn = nil
   end
 end
 
