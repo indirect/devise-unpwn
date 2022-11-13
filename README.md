@@ -1,15 +1,13 @@
 # Devise::Unpwn
-Devise extension that checks user passwords against the PwnedPasswords dataset (https://haveibeenpwned.com/Passwords).
 
-Checks for compromised ("pwned") passwords in 2 different places/ways:
-1. As a standard model validation using [pwned](https://github.com/philnash/pwned). This:
-   - prevents new users from being created (signing up) with a compromised password
-   - prevents existing users from changing their password to a password that is known to be compromised
-2. (Optionally) Whenever a user signs in, checks if their current password is compromised and shows a warning if it is.
+A Devise extension that validates user passwords against the [haveibeenpwned.com dataset of breached passwords](https://haveibeenpwned.com/Passwords).
 
-Based on [devise-uncommon_password](https://github.com/HCLarsen/devise-uncommon_password).
+The validation leverages the [unpwn](https://github.com/indirect/unpwn) and [pwned](https://github.com/philnash/pwned) gems, to first do an offline check against a bloom filter containing the top one million most common breached passwords, and then check the online API to verify that the password has never been seen in any known breach.
 
-Recently the HaveIBeenPwned API has moved to an [authenticated/paid model](https://www.troyhunt.com/authentication-and-the-have-i-been-pwned-api/), but this does not affect the PwnedPasswords API; no payment or authentication is required.
+The check runs at 3 different times:
+1. When signing up for a new account, to block any publicly known passwords.
+2. When changing a password, to block any publicly known passwords.
+3. When signing in, to show a warning if the password has become compromised (optional).
 
 ## Installation
 
@@ -18,12 +16,12 @@ bundle add devise-unpwn
 ```
 
 ## Usage
+
 Add the `:unpwned` module to your existing Devise model.
 
 ```ruby
-class AdminUser < ApplicationRecord
-  devise :database_authenticatable,
-         :recoverable, :rememberable, :trackable, :validatable, :unpwned
+class User < ApplicationRecord
+  devise :database_authenticatable, :validatable, :unpwned
 end
 ```
 
@@ -44,7 +42,7 @@ en:
       pwned_password: "has previously appeared in a data breach and should never be used. If you've ever used it anywhere before, change it immediately!"
 ```
 
-You can set options for the HTTP request that the Pwned gem will make to the API in the Devise initializer at `config/initializers/devise.rb`, like this:
+You can set options for the HTTP request that the `pwned` gem will make to the API in the Devise initializer at `config/initializers/devise.rb`, like this:
 
 ```ruby
 config.unpwn_request_options = {
