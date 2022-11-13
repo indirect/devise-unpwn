@@ -15,6 +15,9 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-gem "devise", "~> 4"
-
-gem "sprockets-rails", "~> 3.4"
+group :development, :test do
+  gem "rails", "~> 7.0"
+  gem "sprockets-rails", "~> 3.4"
+  gem "sqlite3", "~> 1.5"
+  gem "rubocop", "~> 0.52.1"
+end
