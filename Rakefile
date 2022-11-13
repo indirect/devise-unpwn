@@ -7,6 +7,9 @@ rescue LoadError
   puts "You must `gem install bundler` and `bundle install` to run rake tasks"
 end
 
+desc "Create git tag and push"
+task tag: "release:source_control_push"
+
 require "rdoc/task"
 
 RDoc::Task.new(:rdoc) do |rdoc|
