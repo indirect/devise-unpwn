@@ -245,7 +245,8 @@ Devise.setup do |config|
   # config.navigational_formats = ['*/*', :html]
 
   # The default HTTP method used to sign out a resource. Default is :delete.
-  config.sign_out_via = :delete
+  # config.sign_out_via = :delete
+  config.sign_out_via = :get
 
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting
@@ -278,4 +279,8 @@ Devise.setup do |config|
   # Minimum number of times a pwned password must exist in the data set in order
   # to be reject.
   # config.min_password_matches = 1
+
+  # Minimum number of times a pwned password must exist in the data set in order
+  # to warn the user.
+  # config.min_password_matches_warn = 1
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "net/http"
+require "pwned"
 require "devise/unpwn/hooks/unpwn"
 
 module Devise
@@ -14,39 +14,53 @@ module Devise
       extend ActiveSupport::Concern
 
       included do
-        validate :unpwned_password, if: :password_required?
+        validate :not_pwned_password,
+          if: Devise.activerecord51? ? :will_save_change_to_encrypted_password? : :encrypted_password_changed?
       end
 
       module ClassMethods
         Devise::Models.config(self, :min_password_matches)
-        Devise::Models.config(self, :unpwn_open_timeout)
-        Devise::Models.config(self, :unpwn_read_timeout)
+        Devise::Models.config(self, :min_password_matches_warn)
+        Devise::Models.config(self, :pwned_password_check_on_sign_in)
+        Devise::Models.config(self, :pwned_password_open_timeout)
+        Devise::Models.config(self, :pwned_password_read_timeout)
       end
 
       def pwned?
         @pwned ||= false
       end
 
-      # Returns true if password is present in the HaveIBeenPwned dataset
-      # Implement retry behaviour described here https://haveibeenpwned.com/API/v2#RateLimiting
+      def pwned_count
+        @pwned_count ||= 0
+      end
+
+      # Returns true if password is present in the PwnedPasswords dataset
       def password_pwned?(password)
         @pwned = false
-        hash = Digest::SHA1.hexdigest(password.to_s).upcase
-        prefix, suffix = hash.slice!(0..4), hash
+        @pwned_count = 0
 
-        user_agent = "devise_unpwn"
-
-        uri = URI.parse("https://api.pwnedpasswords.com/range/#{prefix}")
-
+        options = {
+          headers: {"User-Agent" => "devise_pwned_password"},
+          read_timeout: self.class.pwned_password_read_timeout,
+          open_timeout: self.class.pwned_password_open_timeout
+        }
+        pwned_password = Pwned::Password.new(password.to_s, options)
         begin
-          Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: self.class.unpwn_open_timeout, read_timeout: self.class.unpwn_read_timeout) do |http|
-            request = Net::HTTP::Get.new(uri.request_uri, "User-Agent" => user_agent)
-            response = http.request request
-            return false unless response.is_a?(Net::HTTPSuccess)
-            @pwned = usage_count(response.read_body, suffix) >= self.class.min_password_matches
+          @pwned_count = pwned_password.pwned_count
+          @pwned = @pwned_count >= (
+            if persisted?
+              # If you do have a different warning threshold, that threshold will also be used
+              # when a user changes their password so that they don't continue to be warned if they
+              # choose another password that is in the pwned list but occurs with a frequency below
+              # the main threshold that is used for *new* user registrations.
+              self.class.min_password_matches_warn || self.class.min_password_matches
+            else
+              self.class.min_password_matches
+            end
+          )
             return @pwned
-          end
-        rescue
+        rescue Pwned::Error
+          # This deliberately silently swallows errors and returns false (valid) if there was an error. Most apps won't want to tie the ability to sign up users to the availability of a third-party API.
           return false
         end
 
@@ -55,21 +69,9 @@ module Devise
 
       private
 
-      def usage_count(response, suffix)
-        count = 0
-        response.each_line do |line|
-          if line.start_with? suffix
-            count = line.strip.split(":").last.to_i
-            break
-          end
-        end
-        count
-      end
-
-      def unpwned_password
-        # This deliberately fails silently on 500's etc. Most apps wont want to tie the ability to sign up customers to the availability of a third party API
+      def not_pwned_password
         if password_pwned?(password)
-          errors.add(:password, :pwned_password)
+          errors.add(:password, :pwned_password, count: @pwned_count)
         end
       end
     end
