@@ -1,9 +1,10 @@
 name: Gem push
     
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [ "tests" ]
-    branches: [ "main" ]
+    tags: [ "*" ]
     types:
       - completed
 
@@ -19,7 +20,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
 
     - name: Publish to GPR
       run: |
