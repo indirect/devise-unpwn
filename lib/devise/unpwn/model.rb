@@ -14,8 +14,7 @@ module Devise
       extend ActiveSupport::Concern
 
       included do
-        validate :not_pwned_password,
-          if: Devise.activerecord51? ? :will_save_change_to_encrypted_password? : :encrypted_password_changed?
+        validate :not_pwned_password, if: :will_save_change_to_encrypted_password?
       end
 
       module ClassMethods
