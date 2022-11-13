@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    devise-unpwn (0.9.1)
+    devise-unpwn (1.0.0)
       devise (~> 4.0)
       unpwn (~> 1.0)
 
