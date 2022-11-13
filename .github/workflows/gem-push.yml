@@ -4,14 +4,13 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows: [ "tests" ]
-    tags: [ "*" ]
     types:
       - completed
 
 jobs:
   push_to_rubygems:
     name: Publish to RubyGems.org
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.ref_type == 'tag' && github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
