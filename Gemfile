@@ -16,3 +16,5 @@ gemspec
 # gem 'byebug', group: [:development, :test]
 
 gem "devise", "~> 4"
+
+gem "sprockets-rails", "~> 3.4"
